@@ -1,96 +1,132 @@
-<!DOCTYPE html>
+from PIL import Image
+from pathlib import Path
+from zipfile import ZipFile
+
+# Define image paths
+image_paths = {
+    "chamomile.jpg": "chamomile.jpg",
+    "rose.jpg": "rose.jpg",
+    "dandelion.jpg": "dandelion.jpg",
+    "osmanthus1.jpg": "osmanthus1.jpg",
+    "osmanthus2.jpg": "osmanthus2.jpg"
+}
+
+# Use a consistent local path for generated image
+source_img_path = "/mnt/data/A_website_homepage_screenshot_for_\"Revair,\"_a_herb.png"
+
+# Create a working directory
+final_folder = "/mnt/data/revair_website_final"
+os.makedirs(final_folder, exist_ok=True)
+
+# Crop parts of the generated image to use as separate product images
+img = Image.open(source_img_path)
+
+# Define crops manually (based on the layout above)
+crop_regions = {
+    "chamomile.jpg": (60, 360, 240, 540),
+    "rose.jpg": (280, 360, 460, 540),
+    "dandelion.jpg": (500, 360, 680, 540),
+    "osmanthus1.jpg": (60, 680, 240, 860),
+    "osmanthus2.jpg": (280, 680, 460, 860)
+}
+
+# Save cropped images
+for name, region in crop_regions.items():
+    cropped = img.crop(region)
+    cropped.save(os.path.join(final_folder, name))
+
+# Define HTML using local image paths
+html_code = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Matcha & Cream Herbal Teas</title>
+  <title>Revair Herbal Teas</title>
   <style>
-    body {
+    body {{
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Georgia, serif;
       background-color: #fff2d4;
       color: #2e2e2e;
-    }
-    header {
+    }}
+    header {{
       background-color: #abc37e;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }}
+    header h1 {{
+      margin: 0;
       color: #fff;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      background-color: #95b87d;
-      padding: 0.5rem;
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 1rem;
+    }}
+    nav a {{
+      margin-left: 2rem;
+      color: #fff;
       text-decoration: none;
       font-weight: bold;
-    }
-    .hero {
+    }}
+    .hero {{
       background-color: #f6e7c6;
-      padding: 2rem;
       text-align: center;
-    }
-    .hero h1 {
-      margin: 0;
-    }
-    .products {
+      padding: 3rem 1rem;
+    }}
+    .hero h2 {{
+      margin: 0 0 1rem;
+    }}
+    .products {{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
       padding: 2rem;
-    }
-    .product {
-      background-color: #fff;
+    }}
+    .product {{
+      background: #fff;
       border: 1px solid #ccc;
+      border-radius: 10px;
       padding: 1rem;
       text-align: center;
-      border-radius: 10px;
-    }
-    .product img {
+    }}
+    .product img {{
       max-width: 100%;
-      height: auto;
       border-radius: 5px;
-    }
-    .product button {
+    }}
+    .product button {{
       margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
       background-color: #abc37e;
       border: none;
       color: white;
-      cursor: pointer;
+      padding: 0.5rem 1rem;
       border-radius: 5px;
-    }
-    footer {
+      cursor: pointer;
+    }}
+    #cart {{
+      background-color: #f6e7c6;
+      padding: 1rem 2rem;
+    }}
+    footer {{
       background-color: #abc37e;
       color: white;
       text-align: center;
       padding: 1rem;
       margin-top: 2rem;
-    }
-    #cart {
-      padding: 1rem;
-      background-color: #f6e7c6;
-    }
+    }}
   </style>
 </head>
 <body>
   <header>
-    <h1>Matcha & Cream Herbal Teas</h1>
+    <h1>Revair</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
   </header>
 
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">Shop</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-  </nav>
-
   <section class="hero">
-    <h1>Herbal Teas for Every Mood</h1>
-    <p>Relax, refresh, and energize with our premium selection</p>
+    <h2>Elevate Your Ritual with Revair Herbal Teas</h2>
+    <p>Sourced from nature. Blended for clarity, calm, and connection.</p>
   </section>
 
   <section class="products" id="product-list"></section>
@@ -102,16 +138,16 @@
   </section>
 
   <footer>
-    <p>&copy; 2025 Matcha & Cream Herbal Teas. All rights reserved.</p>
+    <p>&copy; 2025 Revair Herbal Teas</p>
   </footer>
 
   <script>
     const products = [
-      { name: 'Chamomile Tea', img: 'https://ae01.alicdn.com/kf/Sf1545d2d29b246a8a6cb2e67146082c2b.jpg', price: 5.99 },
-      { name: 'Lemongrass Herbal Tea', img: 'https://ae01.alicdn.com/kf/S22c155f1b2c44a1dba21ed9b8103b3fdV.jpg', price: 6.99 },
-      { name: 'Rose Flower Tea', img: 'https://ae01.alicdn.com/kf/S68803c4b1c9a4e5a8e580aaf2877b8e9Q.jpg', price: 7.99 },
-      { name: 'Dandelion Root Tea', img: 'https://ae01.alicdn.com/kf/Sd44cf4ff7ce8403a9c59a2b63f5777f1L.jpg', price: 8.99 },
-      { name: 'Osmanthus Flower Tea', img: 'https://ae01.alicdn.com/kf/Sbd5c82ae663f408497328af4829c95b9P.jpg', price: 9.99 },
+      {{ name: 'Chamomile Tea', img: 'chamomile.jpg', price: 5.99 }},
+      {{ name: 'Rose Flower Tea', img: 'rose.jpg', price: 6.99 }},
+      {{ name: 'Dandelion Root Tea', img: 'dandelion.jpg', price: 7.99 }},
+      {{ name: 'Osmanthus Flower Tea', img: 'osmanthus1.jpg', price: 8.99 }},
+      {{ name: 'Osmanthus Flower Tea', img: 'osmanthus2.jpg', price: 9.99 }}
     ];
 
     const productList = document.getElementById('product-list');
@@ -119,33 +155,48 @@
     const cartTotal = document.getElementById('cart-total');
     let cart = [];
 
-    function updateCart() {
+    function updateCart() {{
       cartItems.innerHTML = '';
       let total = 0;
-      cart.forEach(item => {
+      cart.forEach(item => {{
         const li = document.createElement('li');
-        li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+        li.textContent = `${{item.name}} - $${{item.price.toFixed(2)}}`;
         cartItems.appendChild(li);
         total += item.price;
-      });
+      }});
       cartTotal.textContent = total.toFixed(2);
-    }
+    }}
 
-    products.forEach(p => {
+    products.forEach(p => {{
       const div = document.createElement('div');
       div.className = 'product';
       div.innerHTML = `
-        <img src="${p.img}" alt="${p.name}">
-        <p>${p.name}</p>
-        <p>$${p.price.toFixed(2)}</p>
+        <img src="${{p.img}}" alt="${{p.name}}">
+        <p>${{p.name}}</p>
+        <p>$${{p.price.toFixed(2)}}</p>
         <button>Add to Cart</button>
       `;
-      div.querySelector('button').addEventListener('click', () => {
+      div.querySelector('button').addEventListener('click', () => {{
         cart.push(p);
         updateCart();
-      });
+      }});
       productList.appendChild(div);
-    });
+    }});
   </script>
 </body>
 </html>
+"""
+
+# Save the updated HTML file
+final_html_path = os.path.join(final_folder, "index.html")
+with open(final_html_path, "w") as f:
+    f.write(html_code)
+
+# Zip everything
+final_zip_path = "/mnt/data/revair_site_complete_with_photos.zip"
+with ZipFile(final_zip_path, "w") as zipf:
+    zipf.write(final_html_path, arcname="index.html")
+    for name in crop_regions.keys():
+        zipf.write(os.path.join(final_folder, name), arcname=name)
+
+final_zip_path
